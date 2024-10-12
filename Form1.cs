@@ -26,8 +26,9 @@ namespace StudentPerformanceApp
                 gender VARCHAR(10),
                 race_ethnicity VARCHAR(10),
                 parental_education VARCHAR(100),
-                lunch VARCHAR(10),
+                lunch VARCHAR(15),
                 test_preparation VARCHAR(10),
+                math_score INT,
                 reading_score INT,
                 writing_score INT
             );
@@ -75,7 +76,7 @@ namespace StudentPerformanceApp
             ENCLOSED BY '""' 
             LINES TERMINATED BY '\n'
             IGNORE 1 LINES
-            (gender, race_ethnicity, parental_education, lunch, test_preparation_course, math_score, reading_score, writing_score);
+            (gender, race_ethnicity, parental_education, lunch, test_preparation, math_score, reading_score, writing_score);
             
             LOAD DATA INFILE 'C:/student-por.csv'
             INTO TABLE StudentExtra
