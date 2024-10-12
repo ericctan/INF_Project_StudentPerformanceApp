@@ -14,6 +14,92 @@ namespace StudentPerformanceApp
             InitializeComponent();
         }
 
+        //purely to make it easier, load csv from C:/
+        private void btnCreateDatabase_Click(object sender, EventArgs e) //this button creates/initializes the database if it doesnt already exist, we using darrence format
+        {
+            string createTableQuery = @"
+            CREATE TABLE IF NOT EXISTS StudentPerformance (
+                student_id INT PRIMARY KEY AUTO_INCREMENT,
+                name VARCHAR(100),
+                age INT,
+                gender VARCHAR(10),
+                math_score INT,
+                reading_score INT,
+                writing_score INT
+            );
+        
+            CREATE TABLE IF NOT EXISTS StudentExtra (
+                student_id INT PRIMARY KEY AUTO_INCREMENT,
+                school VARCHAR(10),
+                sex CHAR(1),
+                age INT,
+                address VARCHAR(5),
+                famsize VARCHAR(10),
+                Pstatus CHAR(1),
+                Medu INT,  -- Mother's education
+                Fedu INT,  -- Father's education
+                Mjob CHAR(10),   -- mother job
+                Fjob CHAR(10),  -- father job
+                reason CHAR(10),
+                guardian CHAR(10),
+                traveltime INT,
+                studytime INT,
+                failures INT,
+                schoolsup CHAR(3),
+                famsup CHAR(3),
+                paid CHAR(3),
+                activities CHAR(3),
+                nursery CHAR(3),
+                higher CHAR(3),
+                internet CHAR(3),
+                romantic CHAR(3),
+                famrel INT,
+                freetime INT,
+                goout INT,
+                Dalc INT,
+                Walc INT,
+                health INT,
+                absences INT,
+                G1 INT,
+                G2 INT,
+                G3 INT
+            );
+
+            LOAD DATA INFILE 'C:/StudentsPerformance.csv'
+            INTO TABLE StudentPerformance
+            FIELDS TERMINATED BY ',' 
+            ENCLOSED BY '""' 
+            LINES TERMINATED BY '\n'
+            IGNORE 1 LINES
+            (gender, race_ethnicity, parental_education, lunch, test_preparation_course, math_score, reading_score, writing_score);
+
+            LOAD DATA INFILE 'C:/student-por.csv'
+            INTO TABLE StudentExtra
+            FIELDS TERMINATED BY ',' 
+            ENCLOSED BY '""' 
+            LINES TERMINATED BY '\n'
+            IGNORE 1 LINES
+            (school, sex, age, address, famsize, Pstatus, Medu, Fedu, Mjob, Fjob, reason, guardian, traveltime, studytime, failures, schoolsup, famsup, paid, activities, nursery, higher, internet, romantic, famrel, freetime, goout, Dalc, Walc, health, absences, G1, G2, G3);
+        
+            ";
+
+            try
+            {
+                using (MySqlConnection conn = new MySqlConnection(connectionString))
+                {
+                    conn.Open();
+                    MySqlCommand cmd = new MySqlCommand(createTableQuery, conn);
+                    cmd.ExecuteNonQuery();
+                    MessageBox.Show("Database and tables created successfully.");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message);
+            }
+        }
+
+
         private void searchButton_Click(object sender, EventArgs e)
         {
             string searchQuery = searchTextBox.Text;  // Get the text entered in the search box
@@ -82,8 +168,9 @@ namespace StudentPerformanceApp
             }
 
             return dt;
-        }
 
+
+        }
         private void searchTextBox_TextChanged(object sender, EventArgs e)
         {
 
