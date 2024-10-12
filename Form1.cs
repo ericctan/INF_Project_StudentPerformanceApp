@@ -71,7 +71,7 @@ namespace StudentPerformanceApp
             ENCLOSED BY '""' 
             LINES TERMINATED BY '\n'
             IGNORE 1 LINES
-            (gender, race_ethnicity, parental_education, lunch, test_preparation_course, math_score, reading_score, writing_score);
+            (name, age, gender, math_score, reading_score, writing_score);
 
             LOAD DATA INFILE 'C:/student-por.csv'
             INTO TABLE StudentExtra
@@ -99,7 +99,7 @@ namespace StudentPerformanceApp
             }
         }
 
-
+        
         private void searchButton_Click(object sender, EventArgs e)
         {
             string searchQuery = searchTextBox.Text;  // Get the text entered in the search box
