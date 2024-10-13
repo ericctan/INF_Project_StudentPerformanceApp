@@ -288,9 +288,14 @@ namespace StudentPerformanceApp
 
         private void btnUpdate_Click(object sender, EventArgs e)
         {
+            // Ensure the student ID is entered and valid
+            if (string.IsNullOrEmpty(searchTextBox.Text) || !int.TryParse(searchTextBox.Text, out int studentId))
+            {
+                MessageBox.Show("Please enter a valid Student ID.");
+                return;
+            }
 
             // Collect inputs from UI fields
-            int studentId = int.Parse(searchTextBox.Text);
             string gender = txtGender.Text.Trim();
             string race = txtRace.Text.Trim();
             string parentEdu = txtParentEdu.Text.Trim();
@@ -300,11 +305,7 @@ namespace StudentPerformanceApp
             int readingScore = (int)numReadingScore.Value;
             int writingScore = (int)numWritingScore.Value;
 
-            string updateQuery = "UPDATE StudentPerformance SET gender=@gender, race_ethnicity=@race, parental_education=@parentEdu, " +
-                "lunch=@lunch, test_preparation=@testPrep, math_score=@mathScore, reading_score=@readingScore, writing_score=@writingScore " +
-                " WHERE student_id=@student_id";
-
-            // Validate inputs
+            // Validate that all fields are filled
             if (string.IsNullOrEmpty(gender) || string.IsNullOrEmpty(race) ||
                 string.IsNullOrEmpty(parentEdu) || string.IsNullOrEmpty(lunch) ||
                 string.IsNullOrEmpty(testPrep))
@@ -313,6 +314,7 @@ namespace StudentPerformanceApp
                 return;
             }
 
+            // Validate score inputs
             if (mathScore < 0 || mathScore > 100 ||
                 readingScore < 0 || readingScore > 100 ||
                 writingScore < 0 || writingScore > 100)
@@ -321,6 +323,11 @@ namespace StudentPerformanceApp
                 return;
             }
 
+            // Update query
+            string updateQuery = "UPDATE StudentPerformance SET gender=@gender, race_ethnicity=@race, parental_education=@parentEdu, " +
+                "lunch=@lunch, test_preparation=@testPrep, math_score=@mathScore, reading_score=@readingScore, writing_score=@writingScore " +
+                " WHERE student_id=@student_id";
+
             try
             {
                 using (MySqlConnection conn = new MySqlConnection(connectionString))
@@ -328,7 +335,7 @@ namespace StudentPerformanceApp
                     conn.Open();
                     MySqlCommand cmd = new MySqlCommand(updateQuery, conn);
 
-                    // Add parameters for the stored procedure
+                    // Add parameters for the query
                     cmd.Parameters.AddWithValue("@gender", gender);
                     cmd.Parameters.AddWithValue("@race", race);
                     cmd.Parameters.AddWithValue("@parentEdu", parentEdu);
@@ -339,6 +346,7 @@ namespace StudentPerformanceApp
                     cmd.Parameters.AddWithValue("@writingScore", writingScore);
                     cmd.Parameters.AddWithValue("@student_id", studentId); // Ensure student_id is added
 
+                    // Execute the query
                     cmd.ExecuteNonQuery();
                     MessageBox.Show("Student updated successfully.");
                 }
@@ -347,6 +355,7 @@ namespace StudentPerformanceApp
             {
                 MessageBox.Show("Error: " + ex.Message);
             }
+
         }
     }
 }
