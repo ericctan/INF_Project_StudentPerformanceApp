@@ -347,8 +347,6 @@ namespace StudentPerformanceApp
             {
                 MessageBox.Show("Error: " + ex.Message);
             }
-
         }
     }
-
 }
