@@ -32,6 +32,7 @@
             searchTextBox = new TextBox();
             searchDataGridView = new DataGridView();
             btnCreateDatabase = new Button();
+            btnDeleteStudent = new Button();
             ((System.ComponentModel.ISupportInitialize)searchDataGridView).BeginInit();
             SuspendLayout();
             // 
@@ -72,11 +73,22 @@
             btnCreateDatabase.UseVisualStyleBackColor = true;
             btnCreateDatabase.Click += btnCreateDatabase_Click;
             // 
+            // btnDeleteStudent
+            // 
+            btnDeleteStudent.Location = new Point(632, 418);
+            btnDeleteStudent.Name = "btnDeleteStudent";
+            btnDeleteStudent.Size = new Size(75, 23);
+            btnDeleteStudent.TabIndex = 5;
+            btnDeleteStudent.Text = "Delete Student";
+            btnDeleteStudent.UseVisualStyleBackColor = false;
+            btnDeleteStudent.Click += btnDeleteStudent_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(btnDeleteStudent);
             Controls.Add(btnCreateDatabase);
             Controls.Add(searchDataGridView);
             Controls.Add(searchTextBox);
@@ -94,5 +106,6 @@
         private TextBox searchTextBox;
         private DataGridView searchDataGridView;
         private Button btnCreateDatabase;
+        private Button btnDeleteStudent;
     }
 }
