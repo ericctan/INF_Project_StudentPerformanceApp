@@ -10,7 +10,7 @@ namespace StudentPerformanceApp
 {
     public partial class Form1 : Form
     {
-        private string connectionString = "server=localhost;database=SP_DB;user=root;password=&m0ldeeznuTz;";
+        private string connectionString = "server=localhost;database=SP_DB;user=root;password=password;";
 
         public Form1()
         {
@@ -251,7 +251,7 @@ namespace StudentPerformanceApp
             {
                 MessageBox.Show("Scores must be between 0 and 100.");
                 return;
-            }   
+            }
 
             // Call the procedure to add the student
             try
@@ -279,6 +279,11 @@ namespace StudentPerformanceApp
             {
                 MessageBox.Show("Error: " + ex.Message);
             }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
