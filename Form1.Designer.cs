@@ -242,7 +242,7 @@
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(914, 600);
+            ClientSize = new Size(937, 557);
             Controls.Add(textBox8);
             Controls.Add(textBox7);
             Controls.Add(textBox6);
@@ -260,7 +260,6 @@
             Controls.Add(txtRace);
             Controls.Add(txtGender);
             Controls.Add(btnAddStudent);
-            ClientSize = new Size(800, 450);
             Controls.Add(btnDeleteStudent);
             Controls.Add(btnCreateDatabase);
             Controls.Add(searchDataGridView);
