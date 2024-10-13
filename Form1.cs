@@ -21,8 +21,8 @@ namespace StudentPerformanceApp
         private void btnCreateDatabase_Click(object sender, EventArgs e) //this button creates/initializes the database if it doesnt already exist, we using darrence format
         {
             string createTableQuery = @"
-            DROP TABLE StudentPerformance;
-            DROP TABLE StudentExtra;
+            DROP TABLE IF EXISTS StudentPerformance;
+            DROP TABLE IF EXISTS StudentExtra;
 
             CREATE TABLE IF NOT EXISTS StudentPerformance (
                 student_id INT PRIMARY KEY AUTO_INCREMENT,
@@ -205,7 +205,7 @@ namespace StudentPerformanceApp
 
         private void searchTextBox_TextChanged(object sender, EventArgs e)
         {
-
+            // for search box
         }
 
 
@@ -236,7 +236,7 @@ namespace StudentPerformanceApp
             {
                 MessageBox.Show("Scores must be between 0 and 100.");
                 return;
-            }
+            }   
 
             // Call the procedure to add the student
             try
