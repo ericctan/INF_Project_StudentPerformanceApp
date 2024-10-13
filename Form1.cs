@@ -115,18 +115,17 @@ namespace StudentPerformanceApp
 
             if (string.IsNullOrEmpty(searchQuery))
             {
-                MessageBox.Show("Please enter a student's name or ID.");
+                MessageBox.Show("Please enter one or more student IDs.");
                 return;
             }
 
-            // Call the search function
+            // Call the search function and pass the search query
             DataTable searchResults = SearchStudents(searchQuery);
 
             // Display the results in the DataGridView (or ListBox)
             searchDataGridView.DataSource = searchResults;  // DataGridView 
         }
-
-        // Function to search students by name or ID
+        private DataTable accumulatedResults = new DataTable();
         private DataTable SearchStudents(string searchQuery)
         {
             DataTable dt = new DataTable();
@@ -138,32 +137,18 @@ namespace StudentPerformanceApp
                 {
                     conn.Open();
 
-                    // Check if the search query is a numeric value (student ID)
-                    bool isNumeric = int.TryParse(searchQuery, out int studentId);
-                    string query;
+                    // Split the search query by commas to allow multiple student IDs
+                    string[] studentIds = searchQuery.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
 
-                    if (isNumeric)
-                    {
-                        // Search by student ID
-                        query = "SELECT * FROM StudentPerformance WHERE student_id = @studentId";
-                    }
-                    else
-                    {
-                        // Search by name using LIKE
-                        query = "SELECT * FROM StudentPerformance WHERE name LIKE @searchQuery";
-                    }
+                    // Create a SQL query using IN clause for multiple student IDs
+                    string query = "SELECT * FROM StudentPerformance WHERE student_id IN (" + string.Join(",", studentIds.Select(id => "@studentId" + id.Trim())) + ")";
 
                     using (MySqlCommand cmd = new MySqlCommand(query, conn))
                     {
-                        if (isNumeric)
+                        // Add parameters for each student ID
+                        foreach (string id in studentIds)
                         {
-                            // Add student_id parameter if searching by ID
-                            cmd.Parameters.AddWithValue("@studentId", studentId);
-                        }
-                        else
-                        {
-                            // Add name parameter with wildcards for LIKE search
-                            cmd.Parameters.AddWithValue("@searchQuery", "%" + searchQuery + "%");
+                            cmd.Parameters.AddWithValue("@studentId" + id.Trim(), int.Parse(id.Trim()));
                         }
 
                         MySqlDataAdapter adapter = new MySqlDataAdapter(cmd);
@@ -177,13 +162,30 @@ namespace StudentPerformanceApp
             }
 
             return dt;
-
-
         }
+        private void btnClearResults_Click(object sender, EventArgs e)
+        {
+            accumulatedResults.Clear();  // Clear the accumulated results
+            searchDataGridView.DataSource = null;  // Clear the DataGridView
+            MessageBox.Show("Search results cleared.");
+        }
+
 
         private void btnDeleteStudent_Click(object sender, EventArgs e)
         {
-            int studentId = int.Parse(searchTextBox.Text);  // might as well just use this text box for the same entry
+            // Check if the search box is empty or if it's not a valid number
+            if (string.IsNullOrEmpty(searchTextBox.Text) || !int.TryParse(searchTextBox.Text, out int studentId))
+            {
+                // Prompt the user to enter the student ID
+                string input = Microsoft.VisualBasic.Interaction.InputBox("Enter the Student ID to delete:", "Delete Student", "");
+
+                // If the user canceled or entered an invalid value, return
+                if (string.IsNullOrEmpty(input) || !int.TryParse(input, out studentId))
+                {
+                    MessageBox.Show("You must enter a valid student ID.", "Error");
+                    return;
+                }
+            }
 
             string deleteQuery = "DELETE FROM StudentPerformance WHERE student_id = @student_id"; // delete based on id
 
@@ -194,8 +196,16 @@ namespace StudentPerformanceApp
                     conn.Open();
                     MySqlCommand cmd = new MySqlCommand(deleteQuery, conn);
                     cmd.Parameters.AddWithValue("@student_id", studentId);
-                    cmd.ExecuteNonQuery();
-                    MessageBox.Show("Student deleted successfully.");
+                    int rowsAffected = cmd.ExecuteNonQuery();
+
+                    if (rowsAffected > 0)
+                    {
+                        MessageBox.Show("Student deleted successfully.");
+                    }
+                    else
+                    {
+                        MessageBox.Show("No student found with that ID.", "Error");
+                    }
                 }
             }
             catch (Exception ex)
@@ -203,6 +213,7 @@ namespace StudentPerformanceApp
                 MessageBox.Show("Error: " + ex.Message);
             }
         }
+
 
         private void searchTextBox_TextChanged(object sender, EventArgs e)
         {
@@ -240,7 +251,7 @@ namespace StudentPerformanceApp
             {
                 MessageBox.Show("Scores must be between 0 and 100.");
                 return;
-            }   
+            }
 
             // Call the procedure to add the student
             try
@@ -269,6 +280,10 @@ namespace StudentPerformanceApp
                 MessageBox.Show("Error: " + ex.Message);
             }
         }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
-//end of code

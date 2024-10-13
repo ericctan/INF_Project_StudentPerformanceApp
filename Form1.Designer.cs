@@ -50,6 +50,8 @@
             textBox7 = new TextBox();
             textBox8 = new TextBox();
             btnDeleteStudent = new Button();
+            btnClearResults = new Button();
+            button1 = new Button();
             ((System.ComponentModel.ISupportInitialize)searchDataGridView).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numMathScore).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numReadingScore).BeginInit();
@@ -58,7 +60,7 @@
             // 
             // searchButton
             // 
-            searchButton.Location = new Point(1645, 761);
+            searchButton.Location = new Point(304, 323);
             searchButton.Name = "searchButton";
             searchButton.Size = new Size(75, 23);
             searchButton.TabIndex = 0;
@@ -68,7 +70,7 @@
             // 
             // searchTextBox
             // 
-            searchTextBox.Location = new Point(1421, 733);
+            searchTextBox.Location = new Point(232, 295);
             searchTextBox.Name = "searchTextBox";
             searchTextBox.Size = new Size(299, 23);
             searchTextBox.TabIndex = 1;
@@ -81,7 +83,7 @@
             searchDataGridView.Location = new Point(13, 10);
             searchDataGridView.Name = "searchDataGridView";
             searchDataGridView.RowHeadersWidth = 51;
-            searchDataGridView.Size = new Size(1707, 278);
+            searchDataGridView.Size = new Size(1105, 278);
             searchDataGridView.TabIndex = 3;
             // 
             // btnCreateDatabase
@@ -243,7 +245,7 @@
             // 
             // btnDeleteStudent
             // 
-            btnDeleteStudent.Location = new Point(1573, 761);
+            btnDeleteStudent.Location = new Point(232, 323);
             btnDeleteStudent.Margin = new Padding(3, 2, 3, 2);
             btnDeleteStudent.Name = "btnDeleteStudent";
             btnDeleteStudent.Size = new Size(66, 23);
@@ -252,11 +254,29 @@
             btnDeleteStudent.UseVisualStyleBackColor = false;
             btnDeleteStudent.Click += btnDeleteStudent_Click;
             // 
+            // btnClearResults
+            // 
+            btnClearResults.Location = new Point(0, 0);
+            btnClearResults.Name = "btnClearResults";
+            btnClearResults.Size = new Size(75, 23);
+            btnClearResults.TabIndex = 0;
+            // 
+            // button1
+            // 
+            button1.Location = new Point(385, 323);
+            button1.Name = "button1";
+            button1.Size = new Size(75, 23);
+            button1.TabIndex = 22;
+            button1.Text = "Clear";
+            button1.UseVisualStyleBackColor = true;
+            button1.Click += btnClearResults_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1732, 796);
+            ClientSize = new Size(1924, 872);
+            Controls.Add(button1);
             Controls.Add(textBox8);
             Controls.Add(textBox7);
             Controls.Add(textBox6);
@@ -313,5 +333,7 @@
         private TextBox textBox7;
         private TextBox textBox8;
         private Button btnDeleteStudent;
+        private Button btnClearResults;
+        private Button button1;
     }
 }
