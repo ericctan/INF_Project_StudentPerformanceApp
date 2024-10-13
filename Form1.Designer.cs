@@ -50,6 +50,7 @@
             textBox7 = new TextBox();
             textBox8 = new TextBox();
             btnDeleteStudent = new Button();
+            btnUpdate = new Button();
             btnClearResults = new Button();
             button1 = new Button();
             ((System.ComponentModel.ISupportInitialize)searchDataGridView).BeginInit();
@@ -271,12 +272,24 @@
             button1.UseVisualStyleBackColor = true;
             button1.Click += btnClearResults_Click;
             // 
+            // btnUpdate
+            // 
+            btnUpdate.Location = new Point(395, 451);
+            btnUpdate.Name = "btnUpdate";
+            btnUpdate.Size = new Size(94, 29);
+            btnUpdate.TabIndex = 22;
+            btnUpdate.Text = "Update";
+            btnUpdate.UseVisualStyleBackColor = true;
+            btnUpdate.Click += btnUpdate_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1924, 872);
             Controls.Add(button1);
+            ClientSize = new Size(937, 557);
+            Controls.Add(btnUpdate);
             Controls.Add(textBox8);
             Controls.Add(textBox7);
             Controls.Add(textBox6);
@@ -335,5 +348,6 @@
         private Button btnDeleteStudent;
         private Button btnClearResults;
         private Button button1;
+        private Button btnUpdate;
     }
 }
