@@ -269,6 +269,71 @@ namespace StudentPerformanceApp
                 MessageBox.Show("Error: " + ex.Message);
             }
         }
+
+        private void btnUpdate_Click(object sender, EventArgs e)
+        {
+
+            // Collect inputs from UI fields
+            int studentId = int.Parse(searchTextBox.Text);
+            string gender = txtGender.Text.Trim();
+            string race = txtRace.Text.Trim();
+            string parentEdu = txtParentEdu.Text.Trim();
+            string lunch = txtLunch.Text.Trim();
+            string testPrep = txtTestPrep.Text.Trim();
+            int mathScore = (int)numMathScore.Value;
+            int readingScore = (int)numReadingScore.Value;
+            int writingScore = (int)numWritingScore.Value;
+
+            string updateQuery = "UPDATE StudentPerformance SET gender=@gender, race_ethnicity=@race, parental_education=@parentEdu, " +
+                "lunch=@lunch, test_preparation=@testPrep, math_score=@mathScore, reading_score=@readingScore, writing_score=@writingScore " +
+                " WHERE student_id=@student_id";
+
+            // Validate inputs
+            if (string.IsNullOrEmpty(gender) || string.IsNullOrEmpty(race) ||
+                string.IsNullOrEmpty(parentEdu) || string.IsNullOrEmpty(lunch) ||
+                string.IsNullOrEmpty(testPrep))
+            {
+                MessageBox.Show("All fields must be filled.");
+                return;
+            }
+
+            if (mathScore < 0 || mathScore > 100 ||
+                readingScore < 0 || readingScore > 100 ||
+                writingScore < 0 || writingScore > 100)
+            {
+                MessageBox.Show("Scores must be between 0 and 100.");
+                return;
+            }
+
+            try
+            {
+                using (MySqlConnection conn = new MySqlConnection(connectionString))
+                {
+                    conn.Open();
+                    MySqlCommand cmd = new MySqlCommand(updateQuery, conn);
+
+                    // Add parameters for the stored procedure
+                    cmd.Parameters.AddWithValue("@gender", gender);
+                    cmd.Parameters.AddWithValue("@race", race);
+                    cmd.Parameters.AddWithValue("@parentEdu", parentEdu);
+                    cmd.Parameters.AddWithValue("@lunch", lunch);
+                    cmd.Parameters.AddWithValue("@testPrep", testPrep);
+                    cmd.Parameters.AddWithValue("@mathScore", mathScore);
+                    cmd.Parameters.AddWithValue("@readingScore", readingScore);
+                    cmd.Parameters.AddWithValue("@writingScore", writingScore);
+                    cmd.Parameters.AddWithValue("@student_id", studentId); // Ensure student_id is added
+
+                    cmd.ExecuteNonQuery();
+                    MessageBox.Show("Student updated successfully.");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message);
+            }
+
+        }
     }
+
 }
 //end of code
