@@ -61,9 +61,9 @@
             // 
             // searchButton
             // 
-            searchButton.Location = new Point(304, 323);
+            searchButton.Location = new Point(537, 295);
             searchButton.Name = "searchButton";
-            searchButton.Size = new Size(75, 23);
+            searchButton.Size = new Size(82, 23);
             searchButton.TabIndex = 0;
             searchButton.Text = "Search";
             searchButton.UseVisualStyleBackColor = true;
@@ -71,9 +71,9 @@
             // 
             // searchTextBox
             // 
-            searchTextBox.Location = new Point(232, 295);
+            searchTextBox.Location = new Point(161, 295);
             searchTextBox.Name = "searchTextBox";
-            searchTextBox.Size = new Size(299, 23);
+            searchTextBox.Size = new Size(370, 23);
             searchTextBox.TabIndex = 1;
             searchTextBox.TextChanged += searchTextBox_TextChanged;
             // 
@@ -99,10 +99,10 @@
             // 
             // btnAddStudent
             // 
-            btnAddStudent.Location = new Point(161, 500);
+            btnAddStudent.Location = new Point(173, 339);
             btnAddStudent.Margin = new Padding(3, 2, 3, 2);
             btnAddStudent.Name = "btnAddStudent";
-            btnAddStudent.Size = new Size(82, 23);
+            btnAddStudent.Size = new Size(100, 25);
             btnAddStudent.TabIndex = 5;
             btnAddStudent.Text = "Add";
             btnAddStudent.UseVisualStyleBackColor = true;
@@ -246,14 +246,25 @@
             // 
             // btnDeleteStudent
             // 
-            btnDeleteStudent.Location = new Point(232, 323);
+            btnDeleteStudent.BackColor = SystemColors.ControlLight;
+            btnDeleteStudent.Location = new Point(412, 339);
             btnDeleteStudent.Margin = new Padding(3, 2, 3, 2);
             btnDeleteStudent.Name = "btnDeleteStudent";
-            btnDeleteStudent.Size = new Size(66, 23);
+            btnDeleteStudent.Size = new Size(100, 25);
             btnDeleteStudent.TabIndex = 5;
             btnDeleteStudent.Text = "Delete Student";
             btnDeleteStudent.UseVisualStyleBackColor = false;
             btnDeleteStudent.Click += btnDeleteStudent_Click;
+            // 
+            // btnUpdate
+            // 
+            btnUpdate.Location = new Point(294, 339);
+            btnUpdate.Name = "btnUpdate";
+            btnUpdate.Size = new Size(100, 25);
+            btnUpdate.TabIndex = 22;
+            btnUpdate.Text = "Update";
+            btnUpdate.UseVisualStyleBackColor = true;
+            btnUpdate.Click += btnUpdate_Click;
             // 
             // btnClearResults
             // 
@@ -264,31 +275,20 @@
             // 
             // button1
             // 
-            button1.Location = new Point(385, 323);
+            button1.Location = new Point(625, 295);
             button1.Name = "button1";
-            button1.Size = new Size(75, 23);
+            button1.Size = new Size(82, 23);
             button1.TabIndex = 22;
             button1.Text = "Clear";
             button1.UseVisualStyleBackColor = true;
             button1.Click += btnClearResults_Click;
             // 
-            // btnUpdate
-            // 
-            btnUpdate.Location = new Point(395, 451);
-            btnUpdate.Name = "btnUpdate";
-            btnUpdate.Size = new Size(94, 29);
-            btnUpdate.TabIndex = 22;
-            btnUpdate.Text = "Update";
-            btnUpdate.UseVisualStyleBackColor = true;
-            btnUpdate.Click += btnUpdate_Click;
-            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1924, 872);
-            Controls.Add(button1);
             ClientSize = new Size(937, 557);
+            Controls.Add(button1);
             Controls.Add(btnUpdate);
             Controls.Add(textBox8);
             Controls.Add(textBox7);
