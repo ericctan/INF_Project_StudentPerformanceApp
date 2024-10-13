@@ -10,7 +10,7 @@ namespace StudentPerformanceApp
 {
     public partial class Form1 : Form
     {
-        private string connectionString = "server=localhost;database=SP_DB;user=root;password=&m0ldeeznuTz;";
+        private string connectionString = "server=localhost;database=SP_DB;user=root;password=password;";
 
         public Form1()
         {
