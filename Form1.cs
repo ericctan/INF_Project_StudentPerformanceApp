@@ -1,6 +1,7 @@
 using MySql.Data.MySqlClient;
 using System;
 using System.Data;
+using System.Diagnostics;
 using System.Windows.Forms;
 
 namespace StudentPerformanceApp
@@ -12,6 +13,7 @@ namespace StudentPerformanceApp
         public Form1()
         {
             InitializeComponent();
+
         }
 
         //purely to make it easier, load csv from C:/
@@ -179,6 +181,65 @@ namespace StudentPerformanceApp
         private void searchTextBox_TextChanged(object sender, EventArgs e)
         {
 
+        }
+
+
+        private void btnAddStudent_Click(object sender, EventArgs e)
+        {
+            // Collect inputs from UI fields
+            string gender = txtGender.Text.Trim();
+            string race = txtRace.Text.Trim();
+            string parentEdu = txtParentEdu.Text.Trim();
+            string lunch = txtLunch.Text.Trim();
+            string testPrep = txtTestPrep.Text.Trim();
+            int mathScore = (int)numMathScore.Value;
+            int readingScore = (int)numReadingScore.Value;
+            int writingScore = (int)numWritingScore.Value;
+
+            // Validate inputs
+            if (string.IsNullOrEmpty(gender) || string.IsNullOrEmpty(race) ||
+                string.IsNullOrEmpty(parentEdu) || string.IsNullOrEmpty(lunch) ||
+                string.IsNullOrEmpty(testPrep))
+            {
+                MessageBox.Show("All fields must be filled.");
+                return;
+            }
+
+            if (mathScore < 0 || mathScore > 100 ||
+                readingScore < 0 || readingScore > 100 ||
+                writingScore < 0 || writingScore > 100)
+            {
+                MessageBox.Show("Scores must be between 0 and 100.");
+                return;
+            }
+
+            // Call the procedure to add the student
+            try
+            {
+                using (MySqlConnection conn = new MySqlConnection(connectionString))
+                {
+                    conn.Open();
+                    MySqlCommand cmd = new MySqlCommand("add_student", conn);
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    // Add parameters for the stored procedure
+                    cmd.Parameters.AddWithValue("@student_gender", gender);
+                    cmd.Parameters.AddWithValue("@student_race", race);
+                    cmd.Parameters.AddWithValue("@student_parentlevel", parentEdu);
+                    cmd.Parameters.AddWithValue("@student_lunch", lunch);
+                    cmd.Parameters.AddWithValue("@student_testprep", testPrep);
+                    cmd.Parameters.AddWithValue("@student_math", mathScore);
+                    cmd.Parameters.AddWithValue("@student_reading", readingScore);
+                    cmd.Parameters.AddWithValue("@student_writing", writingScore);
+
+                    cmd.ExecuteNonQuery();
+                    MessageBox.Show("Student added successfully.");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message);
+            }
         }
     }
 }
