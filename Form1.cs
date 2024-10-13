@@ -3,6 +3,7 @@ using System;
 using System.Data;
 using System.Diagnostics;
 using System.Windows.Forms;
+using System.Xml.Linq;
 
 namespace StudentPerformanceApp
 {
@@ -178,6 +179,30 @@ namespace StudentPerformanceApp
 
 
         }
+
+        private void btnDeleteStudent_Click(object sender, EventArgs e)
+        {
+            int studentId = int.Parse(searchTextBox.Text);  // might as well just use this text box for the same entry
+
+            string deleteQuery = "DELETE FROM StudentPerformance WHERE student_id = @student_id"; // delete based on id
+
+            try
+            {
+                using (MySqlConnection conn = new MySqlConnection(connectionString))
+                {
+                    conn.Open();
+                    MySqlCommand cmd = new MySqlCommand(deleteQuery, conn);
+                    cmd.Parameters.AddWithValue("@student_id", studentId);
+                    cmd.ExecuteNonQuery();
+                    MessageBox.Show("Student deleted successfully.");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message);
+            }
+        }
+
         private void searchTextBox_TextChanged(object sender, EventArgs e)
         {
 

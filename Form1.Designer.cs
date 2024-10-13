@@ -49,6 +49,7 @@
             textBox6 = new TextBox();
             textBox7 = new TextBox();
             textBox8 = new TextBox();
+            btnDeleteStudent = new Button();
             ((System.ComponentModel.ISupportInitialize)searchDataGridView).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numMathScore).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numReadingScore).BeginInit();
@@ -227,6 +228,16 @@
             textBox8.TabIndex = 21;
             textBox8.Text = "Test Prep:";
             // 
+            // btnDeleteStudent
+            // 
+            btnDeleteStudent.Location = new Point(632, 418);
+            btnDeleteStudent.Name = "btnDeleteStudent";
+            btnDeleteStudent.Size = new Size(75, 23);
+            btnDeleteStudent.TabIndex = 5;
+            btnDeleteStudent.Text = "Delete Student";
+            btnDeleteStudent.UseVisualStyleBackColor = false;
+            btnDeleteStudent.Click += btnDeleteStudent_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
@@ -249,6 +260,8 @@
             Controls.Add(txtRace);
             Controls.Add(txtGender);
             Controls.Add(btnAddStudent);
+            ClientSize = new Size(800, 450);
+            Controls.Add(btnDeleteStudent);
             Controls.Add(btnCreateDatabase);
             Controls.Add(searchDataGridView);
             Controls.Add(searchTextBox);
@@ -287,5 +300,6 @@
         private TextBox textBox6;
         private TextBox textBox7;
         private TextBox textBox8;
+        private Button btnDeleteStudent;
     }
 }
