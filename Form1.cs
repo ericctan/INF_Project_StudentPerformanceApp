@@ -10,11 +10,12 @@ namespace StudentPerformanceApp
 {
     public partial class Form1 : Form
     {
-        private string connectionString = "server=localhost;database=SP_DB;user=root;password=password;";
+        private string connectionString = "server=localhost;database=SP_DB;user=root;password=&m0ldeeznuTz;";
 
         public Form1()
         {
             InitializeComponent();
+
 
         }
 
@@ -34,7 +35,8 @@ namespace StudentPerformanceApp
                 test_preparation VARCHAR(10),
                 math_score INT,
                 reading_score INT,
-                writing_score INT
+                writing_score INT,
+                student_average DECIMAL(15,12) AS ((math_score + reading_score + writing_score) / 3) STORED
             );
         
             CREATE TABLE IF NOT EXISTS StudentExtra (
@@ -71,7 +73,8 @@ namespace StudentPerformanceApp
                 absences INT,
                 G1 INT,
                 G2 INT,
-                G3 INT
+                G3 INT,
+                parent_average DECIMAL(15,12) AS ((Medu + Fedu) / 2) STORED
             );
 
             LOAD DATA INFILE 'C:/StudentsPerformance.csv'
@@ -80,7 +83,7 @@ namespace StudentPerformanceApp
             ENCLOSED BY '""' 
             LINES TERMINATED BY '\n'
             IGNORE 1 LINES
-            (gender, race_ethnicity, parental_education, lunch, test_preparation, math_score, reading_score, writing_score);
+            (gender, race_ethnicity, parental_education, lunch, test_preparation, math_score, reading_score, writing_score, student_average);
             
             LOAD DATA INFILE 'C:/student-por.csv'
             INTO TABLE StudentExtra
@@ -88,9 +91,19 @@ namespace StudentPerformanceApp
             ENCLOSED BY '""' 
             LINES TERMINATED BY '\n'
             IGNORE 1 LINES
-            (school, sex, age, address, famsize, Pstatus, Medu, Fedu, Mjob, Fjob, reason, guardian, traveltime, studytime, failures, schoolsup, famsup, paid, activities, nursery, higher, internet, romantic, famrel, freetime, goout, Dalc, Walc, health, absences, G1, G2, G3);
-        
+            (school, sex, age, address, famsize, Pstatus, Medu, Fedu, Mjob, Fjob, reason, guardian, traveltime, studytime, failures, schoolsup, famsup, paid, activities, nursery, higher, internet, romantic, famrel, freetime, goout, Dalc, Walc, health, absences, G1, G2, G3, parent_average);
+            
+            DELETE FROM StudentPerformance ORDER BY student_id DESC LIMIT 500;
+            DELETE FROM StudentExtra ORDER BY student_id DESC LIMIT 149;
+
+            ALTER TABLE StudentPerformance AUTO_INCREMENT = 501;
+
+
+
+
             ";
+
+
 
             try
             {
@@ -327,6 +340,7 @@ namespace StudentPerformanceApp
             string updateQuery = "UPDATE StudentPerformance SET gender=@gender, race_ethnicity=@race, parental_education=@parentEdu, " +
                 "lunch=@lunch, test_preparation=@testPrep, math_score=@mathScore, reading_score=@readingScore, writing_score=@writingScore " +
                 " WHERE student_id=@student_id";
+            
 
             try
             {
@@ -346,6 +360,7 @@ namespace StudentPerformanceApp
                     cmd.Parameters.AddWithValue("@writingScore", writingScore);
                     cmd.Parameters.AddWithValue("@student_id", studentId); // Ensure student_id is added
 
+
                     // Execute the query
                     cmd.ExecuteNonQuery();
                     MessageBox.Show("Student updated successfully.");
@@ -356,5 +371,52 @@ namespace StudentPerformanceApp
                 MessageBox.Show("Error: " + ex.Message);
             }
         }
+
+        private void btnMatch_Click(object sender, EventArgs e)
+        {
+
+
+
+        }
+
+        private void btnPatternSearch_Click(object sender, EventArgs e)
+        {
+
+            //string smartpatternQuery = @"
+            //    SELECT s.student_id, s.student_average, e.student_id, e.parent_average 
+            //   FROM StudentPerformance s
+            //   INNER JOIN StudentExtra e ON s.student_id = e.student_id
+            //   WHERE s.student_average > 80 AND e.parent_average >= 3";
+
+            string goombapatternQuery = @"SELECT s.student_id, s.student_average, e.student_id, e.parent_average 
+                FROM StudentPerformance s
+                INNER JOIN StudentExtra e ON s.student_id = e.student_id
+                WHERE s.student_average < 40 AND e.parent_average <= 2";
+
+            try
+            {
+                using (MySqlConnection conn = new MySqlConnection(connectionString))
+                {
+                    conn.Open();
+
+                    // Execute the query
+                    MySqlDataAdapter adapter = new MySqlDataAdapter(goombapatternQuery, conn);
+                    DataTable dt = new DataTable();
+                    adapter.Fill(dt);
+
+                    // Display the result in the DataGridView
+                    searchDataGridView.DataSource = dt;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message);
+            }
+
+        }
+
+        
+
     }
+    
 }
