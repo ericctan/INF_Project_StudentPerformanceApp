@@ -59,10 +59,9 @@
             // 
             // searchButton
             // 
-            searchButton.Location = new Point(635, 303);
-            searchButton.Margin = new Padding(4, 5, 4, 5);
+            searchButton.Location = new Point(1645, 761);
             searchButton.Name = "searchButton";
-            searchButton.Size = new Size(108, 31);
+            searchButton.Size = new Size(75, 23);
             searchButton.TabIndex = 0;
             searchButton.Text = "Search";
             searchButton.UseVisualStyleBackColor = true;
@@ -70,10 +69,9 @@
             // 
             // searchTextBox
             // 
-            searchTextBox.Location = new Point(202, 303);
-            searchTextBox.Margin = new Padding(4, 5, 4, 5);
+            searchTextBox.Location = new Point(1421, 733);
             searchTextBox.Name = "searchTextBox";
-            searchTextBox.Size = new Size(425, 31);
+            searchTextBox.Size = new Size(299, 23);
             searchTextBox.TabIndex = 1;
             searchTextBox.TextChanged += searchTextBox_TextChanged;
             // 
@@ -81,19 +79,17 @@
             // 
             searchDataGridView.AllowUserToOrderColumns = true;
             searchDataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            searchDataGridView.Location = new Point(19, 16);
-            searchDataGridView.Margin = new Padding(4, 5, 4, 5);
+            searchDataGridView.Location = new Point(13, 10);
             searchDataGridView.Name = "searchDataGridView";
             searchDataGridView.RowHeadersWidth = 51;
-            searchDataGridView.Size = new Size(1109, 269);
+            searchDataGridView.Size = new Size(1707, 278);
             searchDataGridView.TabIndex = 3;
             // 
             // btnCreateDatabase
             // 
-            btnCreateDatabase.Location = new Point(18, 299);
-            btnCreateDatabase.Margin = new Padding(4, 5, 4, 5);
+            btnCreateDatabase.Location = new Point(13, 294);
             btnCreateDatabase.Name = "btnCreateDatabase";
-            btnCreateDatabase.Size = new Size(176, 39);
+            btnCreateDatabase.Size = new Size(123, 23);
             btnCreateDatabase.TabIndex = 4;
             btnCreateDatabase.Text = "Initialize Database";
             btnCreateDatabase.UseVisualStyleBackColor = true;
@@ -101,10 +97,10 @@
             // 
             // btnAddStudent
             // 
-            btnAddStudent.Location = new Point(1008, 299);
-            btnAddStudent.Margin = new Padding(4);
+            btnAddStudent.Location = new Point(161, 500);
+            btnAddStudent.Margin = new Padding(3, 2, 3, 2);
             btnAddStudent.Name = "btnAddStudent";
-            btnAddStudent.Size = new Size(118, 36);
+            btnAddStudent.Size = new Size(82, 23);
             btnAddStudent.TabIndex = 5;
             btnAddStudent.Text = "Add";
             btnAddStudent.UseVisualStyleBackColor = true;
@@ -112,146 +108,146 @@
             // 
             // txtGender
             // 
-            txtGender.Location = new Point(898, 300);
-            txtGender.Margin = new Padding(4);
+            txtGender.Location = new Point(83, 327);
+            txtGender.Margin = new Padding(3, 2, 3, 2);
             txtGender.Name = "txtGender";
-            txtGender.Size = new Size(102, 31);
+            txtGender.Size = new Size(72, 23);
             txtGender.TabIndex = 6;
             // 
             // txtRace
             // 
-            txtRace.Location = new Point(898, 341);
-            txtRace.Margin = new Padding(4);
+            txtRace.Location = new Point(83, 352);
+            txtRace.Margin = new Padding(3, 2, 3, 2);
             txtRace.Name = "txtRace";
-            txtRace.Size = new Size(102, 31);
+            txtRace.Size = new Size(72, 23);
             txtRace.TabIndex = 7;
             // 
             // txtParentEdu
             // 
-            txtParentEdu.Location = new Point(898, 382);
-            txtParentEdu.Margin = new Padding(4);
+            txtParentEdu.Location = new Point(83, 377);
+            txtParentEdu.Margin = new Padding(3, 2, 3, 2);
             txtParentEdu.Name = "txtParentEdu";
-            txtParentEdu.Size = new Size(102, 31);
+            txtParentEdu.Size = new Size(72, 23);
             txtParentEdu.TabIndex = 8;
             // 
             // txtLunch
             // 
-            txtLunch.Location = new Point(898, 424);
-            txtLunch.Margin = new Padding(4);
+            txtLunch.Location = new Point(83, 401);
+            txtLunch.Margin = new Padding(3, 2, 3, 2);
             txtLunch.Name = "txtLunch";
-            txtLunch.Size = new Size(102, 31);
+            txtLunch.Size = new Size(72, 23);
             txtLunch.TabIndex = 9;
             // 
             // txtTestPrep
             // 
-            txtTestPrep.Location = new Point(898, 465);
-            txtTestPrep.Margin = new Padding(4);
+            txtTestPrep.Location = new Point(83, 426);
+            txtTestPrep.Margin = new Padding(3, 2, 3, 2);
             txtTestPrep.Name = "txtTestPrep";
-            txtTestPrep.Size = new Size(102, 31);
+            txtTestPrep.Size = new Size(72, 23);
             txtTestPrep.TabIndex = 10;
             // 
             // numMathScore
             // 
-            numMathScore.Location = new Point(898, 506);
-            numMathScore.Margin = new Padding(4);
+            numMathScore.Location = new Point(83, 451);
+            numMathScore.Margin = new Padding(3, 2, 3, 2);
             numMathScore.Name = "numMathScore";
-            numMathScore.Size = new Size(102, 31);
+            numMathScore.Size = new Size(72, 23);
             numMathScore.TabIndex = 11;
             // 
             // numReadingScore
             // 
-            numReadingScore.Location = new Point(898, 548);
-            numReadingScore.Margin = new Padding(4);
+            numReadingScore.Location = new Point(83, 475);
+            numReadingScore.Margin = new Padding(3, 2, 3, 2);
             numReadingScore.Name = "numReadingScore";
-            numReadingScore.Size = new Size(102, 31);
+            numReadingScore.Size = new Size(72, 23);
             numReadingScore.TabIndex = 12;
             // 
             // numWritingScore
             // 
-            numWritingScore.Location = new Point(898, 589);
-            numWritingScore.Margin = new Padding(4);
+            numWritingScore.Location = new Point(83, 500);
+            numWritingScore.Margin = new Padding(3, 2, 3, 2);
             numWritingScore.Name = "numWritingScore";
-            numWritingScore.Size = new Size(102, 31);
+            numWritingScore.Size = new Size(72, 23);
             numWritingScore.TabIndex = 13;
             // 
             // textBox1
             // 
-            textBox1.Location = new Point(798, 506);
-            textBox1.Margin = new Padding(4);
+            textBox1.Location = new Point(13, 451);
+            textBox1.Margin = new Padding(3, 2, 3, 2);
             textBox1.Name = "textBox1";
-            textBox1.Size = new Size(92, 31);
+            textBox1.Size = new Size(65, 23);
             textBox1.TabIndex = 14;
             textBox1.Text = "Math:";
             // 
             // textBox2
             // 
-            textBox2.Location = new Point(798, 546);
-            textBox2.Margin = new Padding(4);
+            textBox2.Location = new Point(13, 475);
+            textBox2.Margin = new Padding(3, 2, 3, 2);
             textBox2.Name = "textBox2";
-            textBox2.Size = new Size(92, 31);
+            textBox2.Size = new Size(65, 23);
             textBox2.TabIndex = 15;
             textBox2.Text = "Reading:";
             // 
             // textBox3
             // 
-            textBox3.Location = new Point(798, 589);
-            textBox3.Margin = new Padding(4);
+            textBox3.Location = new Point(13, 500);
+            textBox3.Margin = new Padding(3, 2, 3, 2);
             textBox3.Name = "textBox3";
-            textBox3.Size = new Size(92, 31);
+            textBox3.Size = new Size(65, 23);
             textBox3.TabIndex = 16;
             textBox3.Text = "Writing:";
             // 
             // textBox4
             // 
-            textBox4.Location = new Point(798, 299);
-            textBox4.Margin = new Padding(4);
+            textBox4.Location = new Point(13, 326);
+            textBox4.Margin = new Padding(3, 2, 3, 2);
             textBox4.Name = "textBox4";
-            textBox4.Size = new Size(92, 31);
+            textBox4.Size = new Size(65, 23);
             textBox4.TabIndex = 17;
             textBox4.Text = "Gender:";
             // 
             // textBox5
             // 
-            textBox5.Location = new Point(798, 340);
-            textBox5.Margin = new Padding(4);
+            textBox5.Location = new Point(13, 351);
+            textBox5.Margin = new Padding(3, 2, 3, 2);
             textBox5.Name = "textBox5";
-            textBox5.Size = new Size(92, 31);
+            textBox5.Size = new Size(65, 23);
             textBox5.TabIndex = 18;
             textBox5.Text = "Race:";
             // 
             // textBox6
             // 
-            textBox6.Location = new Point(798, 382);
-            textBox6.Margin = new Padding(4);
+            textBox6.Location = new Point(13, 377);
+            textBox6.Margin = new Padding(3, 2, 3, 2);
             textBox6.Name = "textBox6";
-            textBox6.Size = new Size(92, 31);
+            textBox6.Size = new Size(65, 23);
             textBox6.TabIndex = 19;
             textBox6.Text = "Parent Edu:";
             // 
             // textBox7
             // 
-            textBox7.Location = new Point(798, 424);
-            textBox7.Margin = new Padding(4);
+            textBox7.Location = new Point(13, 401);
+            textBox7.Margin = new Padding(3, 2, 3, 2);
             textBox7.Name = "textBox7";
-            textBox7.Size = new Size(92, 31);
+            textBox7.Size = new Size(65, 23);
             textBox7.TabIndex = 20;
             textBox7.Text = "Lunch:";
             // 
             // textBox8
             // 
-            textBox8.Location = new Point(798, 465);
-            textBox8.Margin = new Padding(4);
+            textBox8.Location = new Point(13, 426);
+            textBox8.Margin = new Padding(3, 2, 3, 2);
             textBox8.Name = "textBox8";
-            textBox8.Size = new Size(92, 31);
+            textBox8.Size = new Size(65, 23);
             textBox8.TabIndex = 21;
             textBox8.Text = "Test Prep:";
             // 
             // btnDeleteStudent
             // 
-            btnDeleteStudent.Location = new Point(1008, 343);
-            btnDeleteStudent.Margin = new Padding(4);
+            btnDeleteStudent.Location = new Point(1573, 761);
+            btnDeleteStudent.Margin = new Padding(3, 2, 3, 2);
             btnDeleteStudent.Name = "btnDeleteStudent";
-            btnDeleteStudent.Size = new Size(118, 35);
+            btnDeleteStudent.Size = new Size(66, 23);
             btnDeleteStudent.TabIndex = 5;
             btnDeleteStudent.Text = "Delete Student";
             btnDeleteStudent.UseVisualStyleBackColor = false;
@@ -269,10 +265,9 @@
             // 
             // Form1
             // 
-            AutoScaleDimensions = new SizeF(10F, 25F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1245, 706);
-            Controls.Add(btnClearResults);
+            ClientSize = new Size(1732, 796);
             Controls.Add(textBox8);
             Controls.Add(textBox7);
             Controls.Add(textBox6);
@@ -295,7 +290,6 @@
             Controls.Add(searchDataGridView);
             Controls.Add(searchTextBox);
             Controls.Add(searchButton);
-            Margin = new Padding(4, 5, 4, 5);
             Name = "Form1";
             Text = "Form1";
             ((System.ComponentModel.ISupportInitialize)searchDataGridView).EndInit();

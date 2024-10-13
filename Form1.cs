@@ -1,4 +1,5 @@
 using MySql.Data.MySqlClient;
+using Mysqlx.Crud;
 using System;
 using System.Data;
 using System.Diagnostics;
@@ -9,7 +10,7 @@ namespace StudentPerformanceApp
 {
     public partial class Form1 : Form
     {
-        private string connectionString = "server=localhost;database=SP_DB;user=root;password=password;";
+        private string connectionString = "server=localhost;database=SP_DB;user=root;password=&m0ldeeznuTz;";
 
         public Form1()
         {
@@ -21,8 +22,8 @@ namespace StudentPerformanceApp
         private void btnCreateDatabase_Click(object sender, EventArgs e) //this button creates/initializes the database if it doesnt already exist, we using darrence format
         {
             string createTableQuery = @"
-            DROP TABLE StudentPerformance;
-            DROP TABLE StudentExtra;
+            DROP TABLE IF EXISTS StudentPerformance;
+            DROP TABLE IF EXISTS StudentExtra;
 
             CREATE TABLE IF NOT EXISTS StudentPerformance (
                 student_id INT PRIMARY KEY AUTO_INCREMENT,
@@ -216,7 +217,7 @@ namespace StudentPerformanceApp
 
         private void searchTextBox_TextChanged(object sender, EventArgs e)
         {
-
+            // for search box
         }
 
 
@@ -231,6 +232,9 @@ namespace StudentPerformanceApp
             int mathScore = (int)numMathScore.Value;
             int readingScore = (int)numReadingScore.Value;
             int writingScore = (int)numWritingScore.Value;
+
+            string insertQuery = "INSERT INTO StudentPerformance (gender,race_ethnicity,parental_education,lunch,test_preparation,math_score,reading_score,writing_score)" +
+                  " VALUES (@gender,@race,@parentEdu,@lunch,@testPrep,@mathScore,@readingScore,@writingScore);";
 
             // Validate inputs
             if (string.IsNullOrEmpty(gender) || string.IsNullOrEmpty(race) ||
@@ -247,7 +251,7 @@ namespace StudentPerformanceApp
             {
                 MessageBox.Show("Scores must be between 0 and 100.");
                 return;
-            }
+            }   
 
             // Call the procedure to add the student
             try
@@ -255,18 +259,17 @@ namespace StudentPerformanceApp
                 using (MySqlConnection conn = new MySqlConnection(connectionString))
                 {
                     conn.Open();
-                    MySqlCommand cmd = new MySqlCommand("add_student", conn);
-                    cmd.CommandType = CommandType.StoredProcedure;
+                    MySqlCommand cmd = new MySqlCommand(insertQuery, conn);
 
                     // Add parameters for the stored procedure
-                    cmd.Parameters.AddWithValue("@student_gender", gender);
-                    cmd.Parameters.AddWithValue("@student_race", race);
-                    cmd.Parameters.AddWithValue("@student_parentlevel", parentEdu);
-                    cmd.Parameters.AddWithValue("@student_lunch", lunch);
-                    cmd.Parameters.AddWithValue("@student_testprep", testPrep);
-                    cmd.Parameters.AddWithValue("@student_math", mathScore);
-                    cmd.Parameters.AddWithValue("@student_reading", readingScore);
-                    cmd.Parameters.AddWithValue("@student_writing", writingScore);
+                    cmd.Parameters.AddWithValue("@gender", gender);
+                    cmd.Parameters.AddWithValue("@race", race);
+                    cmd.Parameters.AddWithValue("@parentEdu", parentEdu);
+                    cmd.Parameters.AddWithValue("@lunch", lunch);
+                    cmd.Parameters.AddWithValue("@testPrep", testPrep);
+                    cmd.Parameters.AddWithValue("@mathScore", mathScore);
+                    cmd.Parameters.AddWithValue("@readingScore", readingScore);
+                    cmd.Parameters.AddWithValue("@writingScore", writingScore);
 
                     cmd.ExecuteNonQuery();
                     MessageBox.Show("Student added successfully.");
