@@ -65,7 +65,12 @@ namespace StudentPerformanceApp
                     { "reading_score", int.Parse(values[6]) },
                     { "writing_score", int.Parse(values[7]) }
                 };
+                //for indexing, need fix
+                //await _studentCollection.Indexes.CreateOneAsync(new CreateIndexModel<BsonDocument>(Builders<BsonDocument>.IndexKeys.Ascending("math_score")));
+
                 _studentCollection.InsertOne(document);
+
+
             }
         }
 
@@ -219,6 +224,7 @@ namespace StudentPerformanceApp
         // Advanced Pattern Search Example
         private async void btnPatternSearch_Click(object sender, EventArgs e)
         {
+            //aggregation framework
             var filter = Builders<BsonDocument>.Filter.Lt("student_average", 40);
             var results = await _studentCollection.Find(filter).ToListAsync();
 
