@@ -1,422 +1,228 @@
-using MySql.Data.MySqlClient;
-using Mysqlx.Crud;
+using MongoDB.Driver;
+using MongoDB.Bson;
 using System;
+using System.Collections.Generic;
 using System.Data;
-using System.Diagnostics;
+using System.Linq;
 using System.Windows.Forms;
-using System.Xml.Linq;
+using System.Diagnostics;
+
+//IF YOU SEE THIS MESSAGE, YOU'VE MIGRATED TO NOSQL BRANCH
+//CERTAIN FUNCTIONS NEED TO BE FIXED, CURRENT VERSION NOT FUNCTIONING
 
 namespace StudentPerformanceApp
 {
     public partial class Form1 : Form
     {
-        private string connectionString = "server=localhost;database=SP_DB;user=root;password=&m0ldeeznuTz;";
+        private IMongoDatabase _database;
+        private IMongoCollection<BsonDocument> _studentCollection;
+        private IMongoCollection<BsonDocument> _extraCollection;
 
         public Form1()
         {
             InitializeComponent();
-
-
+            ConnectToMongoDB();
         }
 
-        //purely to make it easier, load csv from C:/
-        private void btnCreateDatabase_Click(object sender, EventArgs e) //this button creates/initializes the database if it doesnt already exist, we using darrence format
+        // MongoDB Connection
+        private void ConnectToMongoDB()
         {
-            string createTableQuery = @"
-            DROP TABLE IF EXISTS StudentPerformance;
-            DROP TABLE IF EXISTS StudentExtra;
+            var client = new MongoClient("mongodb://localhost:27017");
+            _database = client.GetDatabase("SP_DB");
+            _studentCollection = _database.GetCollection<BsonDocument>("StudentPerformance");
+            _extraCollection = _database.GetCollection<BsonDocument>("StudentExtra");
+        }
 
-            CREATE TABLE IF NOT EXISTS StudentPerformance (
-                student_id INT PRIMARY KEY AUTO_INCREMENT,
-                gender VARCHAR(10),
-                race_ethnicity VARCHAR(10),
-                parental_education VARCHAR(100),
-                lunch VARCHAR(15),
-                test_preparation VARCHAR(10),
-                math_score INT,
-                reading_score INT,
-                writing_score INT,
-                student_average DECIMAL(15,12) AS ((math_score + reading_score + writing_score) / 3) STORED
-            );
-        
-            CREATE TABLE IF NOT EXISTS StudentExtra (
-                student_id INT PRIMARY KEY AUTO_INCREMENT,
-                school VARCHAR(10),
-                sex CHAR(1),
-                age INT,
-                address VARCHAR(5),
-                famsize VARCHAR(10),
-                Pstatus CHAR(1),
-                Medu INT,  -- Mother's education
-                Fedu INT,  -- Father's education
-                Mjob CHAR(10),   -- mother job
-                Fjob CHAR(10),  -- father job
-                reason CHAR(10),
-                guardian CHAR(10),
-                traveltime INT,
-                studytime INT,
-                failures INT,
-                schoolsup CHAR(3),
-                famsup CHAR(3),
-                paid CHAR(3),
-                activities CHAR(3),
-                nursery CHAR(3),
-                higher CHAR(3),
-                internet CHAR(3),
-                romantic CHAR(3),
-                famrel INT,
-                freetime INT,
-                goout INT,
-                Dalc INT,
-                Walc INT,
-                health INT,
-                absences INT,
-                G1 INT,
-                G2 INT,
-                G3 INT,
-                parent_average DECIMAL(15,12) AS ((Medu + Fedu) / 2) STORED
-            );
+        // Create Database and Load CSV Data
+        private async void btnCreateDatabase_Click(object sender, EventArgs e)
+        {
+            await _database.DropCollectionAsync("StudentPerformance");
+            await _database.DropCollectionAsync("StudentExtra");
 
-            LOAD DATA INFILE 'C:/StudentsPerformance.csv'
-            INTO TABLE StudentPerformance
-            FIELDS TERMINATED BY ',' 
-            ENCLOSED BY '""' 
-            LINES TERMINATED BY '\n'
-            IGNORE 1 LINES
-            (gender, race_ethnicity, parental_education, lunch, test_preparation, math_score, reading_score, writing_score, student_average);
-            
-            LOAD DATA INFILE 'C:/student-por.csv'
-            INTO TABLE StudentExtra
-            FIELDS TERMINATED BY ',' 
-            ENCLOSED BY '""' 
-            LINES TERMINATED BY '\n'
-            IGNORE 1 LINES
-            (school, sex, age, address, famsize, Pstatus, Medu, Fedu, Mjob, Fjob, reason, guardian, traveltime, studytime, failures, schoolsup, famsup, paid, activities, nursery, higher, internet, romantic, famrel, freetime, goout, Dalc, Walc, health, absences, G1, G2, G3, parent_average);
-            
-            DELETE FROM StudentPerformance ORDER BY student_id DESC LIMIT 500;
-            DELETE FROM StudentExtra ORDER BY student_id DESC LIMIT 149;
+            _studentCollection = _database.GetCollection<BsonDocument>("StudentPerformance");
+            _extraCollection = _database.GetCollection<BsonDocument>("StudentExtra");
 
-            ALTER TABLE StudentPerformance AUTO_INCREMENT = 501;
+            LoadStudentPerformanceData("C:/StudentsPerformance.csv");
+            LoadStudentExtraData("C:/student-por.csv");
 
+            MessageBox.Show("Database and collections created successfully.");
+        }
 
-
-
-            ";
-
-
-
-            try
+        private void LoadStudentPerformanceData(string filePath)
+        {
+            var csvLines = System.IO.File.ReadAllLines(filePath);
+            for (int i = 1; i < csvLines.Length; i++)
             {
-                using (MySqlConnection conn = new MySqlConnection(connectionString))
+                var values = csvLines[i].Split(',');
+                var document = new BsonDocument
                 {
-                    conn.Open();
-                    MySqlCommand cmd = new MySqlCommand(createTableQuery, conn);
-                    cmd.ExecuteNonQuery();
-                    MessageBox.Show("Database and tables created successfully.");
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error: " + ex.Message);
+                    { "gender", values[0] },
+                    { "race_ethnicity", values[1] },
+                    { "parental_education", values[2] },
+                    { "lunch", values[3] },
+                    { "test_preparation", values[4] },
+                    { "math_score", int.Parse(values[5]) },
+                    { "reading_score", int.Parse(values[6]) },
+                    { "writing_score", int.Parse(values[7]) }
+                };
+                _studentCollection.InsertOne(document);
             }
         }
 
-
-        private void searchButton_Click(object sender, EventArgs e)
+        private void LoadStudentExtraData(string filePath)
         {
-            string searchQuery = searchTextBox.Text;  // Get the text entered in the search box
+            var csvLines = System.IO.File.ReadAllLines(filePath);
+            for (int i = 1; i < csvLines.Length; i++)
+            {
+                var values = csvLines[i].Split(',');
+                var document = new BsonDocument
+                {
+                    { "school", values[0] },
+                    { "sex", values[1] },
+                    { "age", int.Parse(values[2]) },
+                    { "address", values[3] },
+                    { "famsize", values[4] },
+                    { "Pstatus", values[5] },
+                    { "Medu", int.Parse(values[6]) },
+                    { "Fedu", int.Parse(values[7]) },
+                    { "Mjob", values[8] },
+                    { "Fjob", values[9] },
+                    { "reason", values[10] },
+                    { "guardian", values[11] },
+                    { "traveltime", int.Parse(values[12]) },
+                    { "studytime", int.Parse(values[13]) },
+                    { "failures", int.Parse(values[14]) },
+                    { "schoolsup", values[15] },
+                    { "famsup", values[16] },
+                    { "paid", values[17] },
+                    { "activities", values[18] },
+                    { "nursery", values[19] },
+                    { "higher", values[20] },
+                    { "internet", values[21] },
+                    { "romantic", values[22] },
+                    { "famrel", int.Parse(values[23]) },
+                    { "freetime", int.Parse(values[24]) },
+                    { "goout", int.Parse(values[25]) },
+                    { "Dalc", int.Parse(values[26]) },
+                    { "Walc", int.Parse(values[27]) },
+                    { "health", int.Parse(values[28]) },
+                    { "absences", int.Parse(values[29]) },
+                    { "G1", int.Parse(values[30]) },
+                    { "G2", int.Parse(values[31]) },
+                    { "G3", int.Parse(values[32]) }
+                };
+                _extraCollection.InsertOne(document);
+            }
+        }
 
+        // Search Student Function
+        private async void searchButton_Click(object sender, EventArgs e)
+        {
+            string searchQuery = searchTextBox.Text.Trim();
             if (string.IsNullOrEmpty(searchQuery))
             {
-                MessageBox.Show("Please enter one or more student IDs.");
+                MessageBox.Show("Please enter a student's ID or name.");
                 return;
             }
 
-            // Call the search function and pass the search query
-            DataTable searchResults = SearchStudents(searchQuery);
+            var filter = Builders<BsonDocument>.Filter.Eq("student_id", int.Parse(searchQuery));
+            var results = await _studentCollection.Find(filter).ToListAsync();
 
-            // Display the results in the DataGridView (or ListBox)
-            searchDataGridView.DataSource = searchResults;  // DataGridView 
+            searchDataGridView.DataSource = ConvertToDataTable(results);
         }
-        private DataTable accumulatedResults = new DataTable();
-        private DataTable SearchStudents(string searchQuery)
+
+        private void searchTextBox_TextChanged(object sender, EventArgs e)
         {
-            DataTable dt = new DataTable();
-
-            try
+            if (!string.IsNullOrWhiteSpace(searchTextBox.Text))
             {
-                // Connect to the MariaDB database
-                using (MySqlConnection conn = new MySqlConnection(connectionString))
-                {
-                    conn.Open();
-
-                    // Split the search query by commas to allow multiple student IDs
-                    string[] studentIds = searchQuery.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-
-                    // Create a SQL query using IN clause for multiple student IDs
-                    string query = "SELECT * FROM StudentPerformance WHERE student_id IN (" + string.Join(",", studentIds.Select(id => "@studentId" + id.Trim())) + ")";
-
-                    using (MySqlCommand cmd = new MySqlCommand(query, conn))
-                    {
-                        // Add parameters for each student ID
-                        foreach (string id in studentIds)
-                        {
-                            cmd.Parameters.AddWithValue("@studentId" + id.Trim(), int.Parse(id.Trim()));
-                        }
-
-                        MySqlDataAdapter adapter = new MySqlDataAdapter(cmd);
-                        adapter.Fill(dt);
-                    }
-                }
+                Console.WriteLine($"Text changed: {searchTextBox.Text}");
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error: " + ex.Message);
-            }
-
-            return dt;
         }
+
         private void btnClearResults_Click(object sender, EventArgs e)
         {
-            accumulatedResults.Clear();  // Clear the accumulated results
-            searchDataGridView.DataSource = null;  // Clear the DataGridView
+            searchDataGridView.DataSource = null; // clr DataGridView
+            searchTextBox.Clear(); // clr the search text box
             MessageBox.Show("Search results cleared.");
         }
 
 
-        private void btnDeleteStudent_Click(object sender, EventArgs e)
+        private DataTable ConvertToDataTable(List<BsonDocument> documents)
         {
-            // Check if the search box is empty or if it's not a valid number
-            if (string.IsNullOrEmpty(searchTextBox.Text) || !int.TryParse(searchTextBox.Text, out int studentId))
+            var dt = new DataTable();
+            foreach (var doc in documents)
             {
-                // Prompt the user to enter the student ID
-                string input = Microsoft.VisualBasic.Interaction.InputBox("Enter the Student ID to delete:", "Delete Student", "");
-
-                // If the user canceled or entered an invalid value, return
-                if (string.IsNullOrEmpty(input) || !int.TryParse(input, out studentId))
+                foreach (var element in doc.Elements)
                 {
-                    MessageBox.Show("You must enter a valid student ID.", "Error");
-                    return;
+                    if (!dt.Columns.Contains(element.Name))
+                        dt.Columns.Add(element.Name);
                 }
-            }
-
-            string deleteQuery = "DELETE FROM StudentPerformance WHERE student_id = @student_id"; // delete based on id
-
-            try
-            {
-                using (MySqlConnection conn = new MySqlConnection(connectionString))
+                var row = dt.NewRow();
+                foreach (var element in doc.Elements)
                 {
-                    conn.Open();
-                    MySqlCommand cmd = new MySqlCommand(deleteQuery, conn);
-                    cmd.Parameters.AddWithValue("@student_id", studentId);
-                    int rowsAffected = cmd.ExecuteNonQuery();
-
-                    if (rowsAffected > 0)
-                    {
-                        MessageBox.Show("Student deleted successfully.");
-                    }
-                    else
-                    {
-                        MessageBox.Show("No student found with that ID.", "Error");
-                    }
+                    row[element.Name] = element.Value;
                 }
+                dt.Rows.Add(row);
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error: " + ex.Message);
-            }
+            return dt;
         }
 
-
-        private void searchTextBox_TextChanged(object sender, EventArgs e)
+        private async void btnAddStudent_Click(object sender, EventArgs e)
         {
-            // for search box
+            var newStudent = new BsonDocument
+            {
+                { "gender", txtGender.Text },
+                { "race_ethnicity", txtRace.Text },
+                { "parental_education", txtParentEdu.Text },
+                { "lunch", txtLunch.Text },
+                { "test_preparation", txtTestPrep.Text },
+                { "math_score", (int)numMathScore.Value },
+                { "reading_score", (int)numReadingScore.Value },
+                { "writing_score", (int)numWritingScore.Value }
+            };
+
+            await _studentCollection.InsertOneAsync(newStudent);
+            MessageBox.Show("Student added successfully.");
         }
-
-
-        private void btnAddStudent_Click(object sender, EventArgs e)
-        {
-            // Collect inputs from UI fields
-            string gender = txtGender.Text.Trim();
-            string race = txtRace.Text.Trim();
-            string parentEdu = txtParentEdu.Text.Trim();
-            string lunch = txtLunch.Text.Trim();
-            string testPrep = txtTestPrep.Text.Trim();
-            int mathScore = (int)numMathScore.Value;
-            int readingScore = (int)numReadingScore.Value;
-            int writingScore = (int)numWritingScore.Value;
-
-            string insertQuery = "INSERT INTO StudentPerformance (gender,race_ethnicity,parental_education,lunch,test_preparation,math_score,reading_score,writing_score)" +
-                  " VALUES (@gender,@race,@parentEdu,@lunch,@testPrep,@mathScore,@readingScore,@writingScore);";
-
-            // Validate inputs
-            if (string.IsNullOrEmpty(gender) || string.IsNullOrEmpty(race) ||
-                string.IsNullOrEmpty(parentEdu) || string.IsNullOrEmpty(lunch) ||
-                string.IsNullOrEmpty(testPrep))
-            {
-                MessageBox.Show("All fields must be filled.");
-                return;
-            }
-
-            if (mathScore < 0 || mathScore > 100 ||
-                readingScore < 0 || readingScore > 100 ||
-                writingScore < 0 || writingScore > 100)
-            {
-                MessageBox.Show("Scores must be between 0 and 100.");
-                return;
-            }
-
-            // Call the procedure to add the student
-            try
-            {
-                using (MySqlConnection conn = new MySqlConnection(connectionString))
-                {
-                    conn.Open();
-                    MySqlCommand cmd = new MySqlCommand(insertQuery, conn);
-
-                    // Add parameters for the stored procedure
-                    cmd.Parameters.AddWithValue("@gender", gender);
-                    cmd.Parameters.AddWithValue("@race", race);
-                    cmd.Parameters.AddWithValue("@parentEdu", parentEdu);
-                    cmd.Parameters.AddWithValue("@lunch", lunch);
-                    cmd.Parameters.AddWithValue("@testPrep", testPrep);
-                    cmd.Parameters.AddWithValue("@mathScore", mathScore);
-                    cmd.Parameters.AddWithValue("@readingScore", readingScore);
-                    cmd.Parameters.AddWithValue("@writingScore", writingScore);
-
-                    cmd.ExecuteNonQuery();
-                    MessageBox.Show("Student added successfully.");
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error: " + ex.Message);
-            }
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void btnUpdate_Click(object sender, EventArgs e)
-        {
-            // Ensure the student ID is entered and valid
-            if (string.IsNullOrEmpty(searchTextBox.Text) || !int.TryParse(searchTextBox.Text, out int studentId))
-            {
-                MessageBox.Show("Please enter a valid Student ID.");
-                return;
-            }
-
-            // Collect inputs from UI fields
-            string gender = txtGender.Text.Trim();
-            string race = txtRace.Text.Trim();
-            string parentEdu = txtParentEdu.Text.Trim();
-            string lunch = txtLunch.Text.Trim();
-            string testPrep = txtTestPrep.Text.Trim();
-            int mathScore = (int)numMathScore.Value;
-            int readingScore = (int)numReadingScore.Value;
-            int writingScore = (int)numWritingScore.Value;
-
-            // Validate that all fields are filled
-            if (string.IsNullOrEmpty(gender) || string.IsNullOrEmpty(race) ||
-                string.IsNullOrEmpty(parentEdu) || string.IsNullOrEmpty(lunch) ||
-                string.IsNullOrEmpty(testPrep))
-            {
-                MessageBox.Show("All fields must be filled.");
-                return;
-            }
-
-            // Validate score inputs
-            if (mathScore < 0 || mathScore > 100 ||
-                readingScore < 0 || readingScore > 100 ||
-                writingScore < 0 || writingScore > 100)
-            {
-                MessageBox.Show("Scores must be between 0 and 100.");
-                return;
-            }
-
-            // Update query
-            string updateQuery = "UPDATE StudentPerformance SET gender=@gender, race_ethnicity=@race, parental_education=@parentEdu, " +
-                "lunch=@lunch, test_preparation=@testPrep, math_score=@mathScore, reading_score=@readingScore, writing_score=@writingScore " +
-                " WHERE student_id=@student_id";
-            
-
-            try
-            {
-                using (MySqlConnection conn = new MySqlConnection(connectionString))
-                {
-                    conn.Open();
-                    MySqlCommand cmd = new MySqlCommand(updateQuery, conn);
-
-                    // Add parameters for the query
-                    cmd.Parameters.AddWithValue("@gender", gender);
-                    cmd.Parameters.AddWithValue("@race", race);
-                    cmd.Parameters.AddWithValue("@parentEdu", parentEdu);
-                    cmd.Parameters.AddWithValue("@lunch", lunch);
-                    cmd.Parameters.AddWithValue("@testPrep", testPrep);
-                    cmd.Parameters.AddWithValue("@mathScore", mathScore);
-                    cmd.Parameters.AddWithValue("@readingScore", readingScore);
-                    cmd.Parameters.AddWithValue("@writingScore", writingScore);
-                    cmd.Parameters.AddWithValue("@student_id", studentId); // Ensure student_id is added
-
-
-                    // Execute the query
-                    cmd.ExecuteNonQuery();
-                    MessageBox.Show("Student updated successfully.");
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error: " + ex.Message);
-            }
-        }
-
-        private void btnMatch_Click(object sender, EventArgs e)
-        {
-
-
-
-        }
-
-        private void btnPatternSearch_Click(object sender, EventArgs e)
-        {
-
-            //string smartpatternQuery = @"
-            //    SELECT s.student_id, s.student_average, e.student_id, e.parent_average 
-            //   FROM StudentPerformance s
-            //   INNER JOIN StudentExtra e ON s.student_id = e.student_id
-            //   WHERE s.student_average > 80 AND e.parent_average >= 3";
-
-            string goombapatternQuery = @"SELECT s.student_id, s.student_average, e.student_id, e.parent_average 
-                FROM StudentPerformance s
-                INNER JOIN StudentExtra e ON s.student_id = e.student_id
-                WHERE s.student_average < 40 AND e.parent_average <= 2";
-
-            try
-            {
-                using (MySqlConnection conn = new MySqlConnection(connectionString))
-                {
-                    conn.Open();
-
-                    // Execute the query
-                    MySqlDataAdapter adapter = new MySqlDataAdapter(goombapatternQuery, conn);
-                    DataTable dt = new DataTable();
-                    adapter.Fill(dt);
-
-                    // Display the result in the DataGridView
-                    searchDataGridView.DataSource = dt;
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error: " + ex.Message);
-            }
-
-        }
-
-        
-
-    }
     
+
+        private async void btnUpdate_Click(object sender, EventArgs e)
+        {
+            var studentId = int.Parse(searchTextBox.Text);
+            var filter = Builders<BsonDocument>.Filter.Eq("student_id", studentId);
+
+            var update = Builders<BsonDocument>.Update
+                .Set("gender", txtGender.Text)
+                .Set("race_ethnicity", txtRace.Text)
+                .Set("parental_education", txtParentEdu.Text)
+                .Set("lunch", txtLunch.Text)
+                .Set("test_preparation", txtTestPrep.Text)
+                .Set("math_score", (int)numMathScore.Value)
+                .Set("reading_score", (int)numReadingScore.Value)
+                .Set("writing_score", (int)numWritingScore.Value);
+
+            var result = await _studentCollection.UpdateOneAsync(filter, update);
+
+            MessageBox.Show(result.ModifiedCount > 0 ? "Student updated successfully." : "No student found.");
+        }
+
+        private async void btnDeleteStudent_Click(object sender, EventArgs e)
+        {
+            var studentId = int.Parse(searchTextBox.Text);
+            var filter = Builders<BsonDocument>.Filter.Eq("student_id", studentId);
+
+            var result = await _studentCollection.DeleteOneAsync(filter);
+
+            MessageBox.Show(result.DeletedCount > 0 ? "Student deleted successfully." : "No student found.");
+        }
+
+        // Advanced Pattern Search Example
+        private async void btnPatternSearch_Click(object sender, EventArgs e)
+        {
+            var filter = Builders<BsonDocument>.Filter.Lt("student_average", 40);
+            var results = await _studentCollection.Find(filter).ToListAsync();
+
+            searchDataGridView.DataSource = ConvertToDataTable(results);
+        }
+    }
 }
