@@ -9,6 +9,7 @@ using System.Diagnostics;
 
 //IF YOU SEE THIS MESSAGE, YOU'VE MIGRATED TO NOSQL BRANCH
 //CERTAIN FUNCTIONS NEED TO BE FIXED, CURRENT VERSION NOT FUNCTIONING
+//rn loading csv into db works, but the prog cant read
 
 namespace StudentPerformanceApp
 {
@@ -24,7 +25,7 @@ namespace StudentPerformanceApp
             ConnectToMongoDB();
         }
 
-        // MongoDB Connection
+        // db connect
         private void ConnectToMongoDB()
         {
             var client = new MongoClient("mongodb://localhost:27017");
@@ -32,8 +33,20 @@ namespace StudentPerformanceApp
             _studentCollection = _database.GetCollection<BsonDocument>("StudentPerformance");
             _extraCollection = _database.GetCollection<BsonDocument>("StudentExtra");
         }
+        
+        //need to explicitly turn into index, may want to add more indexes depending on our use case
+        private void CreateIndexes()
+        {
+            var studentIndexKeys = Builders<BsonDocument>.IndexKeys.Ascending("student_id");
+            _studentCollection.Indexes.CreateOne(new CreateIndexModel<BsonDocument>(studentIndexKeys));
 
-        // Create Database and Load CSV Data
+            var extraIndexKeys = Builders<BsonDocument>.IndexKeys.Ascending("student_id");
+            _extraCollection.Indexes.CreateOne(new CreateIndexModel<BsonDocument>(extraIndexKeys));
+
+            MessageBox.Show("Student ID indexes created successfully.");
+        }
+
+        // load db
         private async void btnCreateDatabase_Click(object sender, EventArgs e)
         {
             await _database.DropCollectionAsync("StudentPerformance");
@@ -44,6 +57,7 @@ namespace StudentPerformanceApp
 
             LoadStudentPerformanceData("C:/StudentsPerformance.csv");
             LoadStudentExtraData("C:/student-por.csv");
+            CreateIndexes(); //index student_id here 
 
             MessageBox.Show("Database and collections created successfully.");
         }
@@ -51,26 +65,27 @@ namespace StudentPerformanceApp
         private void LoadStudentPerformanceData(string filePath)
         {
             var csvLines = System.IO.File.ReadAllLines(filePath);
-            for (int i = 1; i < csvLines.Length; i++)
+            for (int i = 1; i < csvLines.Length; i++) //also skips header
             {
                 var values = csvLines[i].Split(',');
                 var document = new BsonDocument
                 {
-                    { "gender", values[0] },
-                    { "race_ethnicity", values[1] },
-                    { "parental_education", values[2] },
-                    { "lunch", values[3] },
-                    { "test_preparation", values[4] },
-                    { "math_score", int.Parse(values[5]) },
-                    { "reading_score", int.Parse(values[6]) },
-                    { "writing_score", int.Parse(values[7]) }
+                    { "student_id", values[0] },
+                    { "gender", values[1] },
+                    { "race_ethnicity", values[2] },
+                    { "parental_education", values[3] },
+                    { "lunch", values[4] },
+                    { "test_preparation", values[5] },
+                    { "math_score", int.Parse(values[6]) },
+                    { "reading_score", int.Parse(values[7]) },
+                    { "writing_score", int.Parse(values[8]) },
+                    { "student_average", (int.Parse(values[6]) + int.Parse(values[7]) + int.Parse(values[8])) / 3 }
+
                 };
                 //for indexing, need fix
                 //await _studentCollection.Indexes.CreateOneAsync(new CreateIndexModel<BsonDocument>(Builders<BsonDocument>.IndexKeys.Ascending("math_score")));
 
                 _studentCollection.InsertOne(document);
-
-
             }
         }
 
@@ -82,45 +97,47 @@ namespace StudentPerformanceApp
                 var values = csvLines[i].Split(',');
                 var document = new BsonDocument
                 {
-                    { "school", values[0] },
-                    { "sex", values[1] },
-                    { "age", int.Parse(values[2]) },
-                    { "address", values[3] },
-                    { "famsize", values[4] },
-                    { "Pstatus", values[5] },
-                    { "Medu", int.Parse(values[6]) },
-                    { "Fedu", int.Parse(values[7]) },
-                    { "Mjob", values[8] },
-                    { "Fjob", values[9] },
-                    { "reason", values[10] },
-                    { "guardian", values[11] },
-                    { "traveltime", int.Parse(values[12]) },
-                    { "studytime", int.Parse(values[13]) },
-                    { "failures", int.Parse(values[14]) },
-                    { "schoolsup", values[15] },
-                    { "famsup", values[16] },
-                    { "paid", values[17] },
-                    { "activities", values[18] },
-                    { "nursery", values[19] },
-                    { "higher", values[20] },
-                    { "internet", values[21] },
-                    { "romantic", values[22] },
-                    { "famrel", int.Parse(values[23]) },
-                    { "freetime", int.Parse(values[24]) },
-                    { "goout", int.Parse(values[25]) },
-                    { "Dalc", int.Parse(values[26]) },
-                    { "Walc", int.Parse(values[27]) },
-                    { "health", int.Parse(values[28]) },
-                    { "absences", int.Parse(values[29]) },
-                    { "G1", int.Parse(values[30]) },
-                    { "G2", int.Parse(values[31]) },
-                    { "G3", int.Parse(values[32]) }
-                };
+                    { "student_id", values[0] }, //saving this as a student id value for now
+                    { "school", values[1] },
+                    { "sex", values[2] },
+                    { "age", int.Parse(values[3]) },
+                    { "address", values[4] },
+                    { "famsize", values[5] },
+                    { "Pstatus", values[6] },
+                    { "Medu", int.Parse(values[7]) },
+                    { "Fedu", int.Parse(values[8]) },
+                    { "Mjob", values[9] },
+                    { "Fjob", values[10] },
+                    { "reason", values[11] },
+                    { "guardian", values[12] },
+                    { "traveltime", int.Parse(values[13]) },
+                    { "studytime", int.Parse(values[14]) },
+                    { "failures", int.Parse(values[15]) },
+                    { "schoolsup", values[16] },
+                    { "famsup", values[17] },
+                    { "paid", values[18] },
+                    { "activities", values[19] },
+                    { "nursery", values[20] },
+                    { "higher", values[21] },
+                    { "internet", values[22] },
+                    { "romantic", values[23] },
+                    { "famrel", int.Parse(values[24]) },
+                    { "freetime", int.Parse(values[25]) },
+                    { "goout", int.Parse(values[26]) },
+                    { "Dalc", int.Parse(values[27]) },
+                    { "Walc", int.Parse(values[28]) },
+                    { "health", int.Parse(values[29]) },
+                    { "absences", int.Parse(values[30]) },
+                    { "G1", int.Parse(values[31]) },
+                    { "G2", int.Parse(values[32]) },
+                    { "G3", int.Parse(values[33]) },
+                    { "parent_average", (int.Parse(values[7]) + int.Parse(values[8])) / 2 } //temp
+            };
                 _extraCollection.InsertOne(document);
             }
         }
 
-        // Search Student Function
+        // search
         private async void searchButton_Click(object sender, EventArgs e)
         {
             string searchQuery = searchTextBox.Text.Trim();
@@ -130,12 +147,23 @@ namespace StudentPerformanceApp
                 return;
             }
 
-            var filter = Builders<BsonDocument>.Filter.Eq("student_id", int.Parse(searchQuery));
+            var filter = Builders<BsonDocument>.Filter.Eq("student_id", searchQuery); //may need input validation for large int, also need make sure check int or string
             var results = await _studentCollection.Find(filter).ToListAsync();
 
             searchDataGridView.DataSource = ConvertToDataTable(results);
+
+            if (results.Any())
+            {
+                searchDataGridView.DataSource = ConvertToDataTable(results);
+            }
+            else
+            {
+                MessageBox.Show("No matching records found.");
+            }
         }
 
+
+        //dont remove for now
         private void searchTextBox_TextChanged(object sender, EventArgs e)
         {
             if (!string.IsNullOrWhiteSpace(searchTextBox.Text))
@@ -143,14 +171,6 @@ namespace StudentPerformanceApp
                 Console.WriteLine($"Text changed: {searchTextBox.Text}");
             }
         }
-
-        private void btnClearResults_Click(object sender, EventArgs e)
-        {
-            searchDataGridView.DataSource = null; // clr DataGridView
-            searchTextBox.Clear(); // clr the search text box
-            MessageBox.Show("Search results cleared.");
-        }
-
 
         private DataTable ConvertToDataTable(List<BsonDocument> documents)
         {
@@ -174,27 +194,63 @@ namespace StudentPerformanceApp
 
         private async void btnAddStudent_Click(object sender, EventArgs e)
         {
+            string studentId = searchTextBox.Text.Trim();
+            if (string.IsNullOrEmpty(studentId))
+            {
+                MessageBox.Show("Please enter a valid student ID.");
+                return;
+            }
             var newStudent = new BsonDocument
             {
-                { "gender", txtGender.Text },
-                { "race_ethnicity", txtRace.Text },
-                { "parental_education", txtParentEdu.Text },
-                { "lunch", txtLunch.Text },
-                { "test_preparation", txtTestPrep.Text },
+                { "student_id", studentId },  // Ensure this ID is unique
+                { "gender", txtGender.Text.Trim() },
+                { "race_ethnicity", txtRace.Text.Trim() },
+                { "parental_education", txtParentEdu.Text.Trim() },
+                { "lunch", txtLunch.Text.Trim() },
+                { "test_preparation", txtTestPrep.Text.Trim() },
                 { "math_score", (int)numMathScore.Value },
                 { "reading_score", (int)numReadingScore.Value },
-                { "writing_score", (int)numWritingScore.Value }
+                { "writing_score", (int)numWritingScore.Value },
+                { "student_average", ((int)numMathScore.Value + (int)numReadingScore.Value + (int)numWritingScore.Value) / 3 }
             };
 
-            await _studentCollection.InsertOneAsync(newStudent);
-            MessageBox.Show("Student added successfully.");
+            // error catch for inserting student record
+            try
+            {
+                //insert
+                await _studentCollection.InsertOneAsync(newStudent);
+
+                MessageBox.Show($"Student with ID {studentId} added successfully."); //debug msg
+
+                // verification
+                var filter = Builders<BsonDocument>.Filter.Eq("student_id", studentId);
+                var results = await _studentCollection.Find(filter).ToListAsync();
+
+                if (results.Any())
+                {
+                    searchDataGridView.DataSource = ConvertToDataTable(results);
+                }
+                else
+                {
+                    MessageBox.Show("Student was added but not found during verification.");
+                }
+            }
+            catch (Exception ex) //error catch
+            {
+                MessageBox.Show($"Error adding student: {ex.Message}");
+            }
         }
-    
+
 
         private async void btnUpdate_Click(object sender, EventArgs e)
         {
-            var studentId = int.Parse(searchTextBox.Text);
-            var filter = Builders<BsonDocument>.Filter.Eq("student_id", studentId);
+            if (!int.TryParse(searchTextBox.Text, out int studentId)) //copium input validation
+            {
+                MessageBox.Show("Please enter a valid student ID.");
+                return; 
+            }
+
+            var filter = Builders<BsonDocument>.Filter.Eq("student_id", searchTextBox.Text);
 
             var update = Builders<BsonDocument>.Update
                 .Set("gender", txtGender.Text)
@@ -204,7 +260,8 @@ namespace StudentPerformanceApp
                 .Set("test_preparation", txtTestPrep.Text)
                 .Set("math_score", (int)numMathScore.Value)
                 .Set("reading_score", (int)numReadingScore.Value)
-                .Set("writing_score", (int)numWritingScore.Value);
+                .Set("writing_score", (int)numWritingScore.Value)
+                .Set("student_average", ((int)numMathScore.Value + (int)numReadingScore.Value + (int)numWritingScore.Value) / 3);
 
             var result = await _studentCollection.UpdateOneAsync(filter, update);
 
@@ -213,22 +270,51 @@ namespace StudentPerformanceApp
 
         private async void btnDeleteStudent_Click(object sender, EventArgs e)
         {
-            var studentId = int.Parse(searchTextBox.Text);
-            var filter = Builders<BsonDocument>.Filter.Eq("student_id", studentId);
+            if (!int.TryParse(searchTextBox.Text, out int studentId)) //more cope
+            {
+                MessageBox.Show("Please enter a valid student ID.");
+                return;
+            }
 
+            var filter = Builders<BsonDocument>.Filter.Eq("student_id", searchTextBox.Text);
             var result = await _studentCollection.DeleteOneAsync(filter);
 
             MessageBox.Show(result.DeletedCount > 0 ? "Student deleted successfully." : "No student found.");
         }
 
-        // Advanced Pattern Search Example
+        //moved clear down here
+        private void btnClearResults_Click(object sender, EventArgs e)
+        {
+            searchDataGridView.DataSource = null; // clr DataGridView
+            searchTextBox.Clear(); // clr the search text box
+            MessageBox.Show("Search results cleared.");
+        }
+
+        // pattern search
         private async void btnPatternSearch_Click(object sender, EventArgs e)
         {
-            //aggregation framework
-            var filter = Builders<BsonDocument>.Filter.Lt("student_average", 40);
+            
+            var filter = Builders<BsonDocument>.Filter.Lt("student_average", 50);
             var results = await _studentCollection.Find(filter).ToListAsync();
 
-            searchDataGridView.DataSource = ConvertToDataTable(results);
+            if (results.Count == 0)
+            {
+                MessageBox.Show("No students found matching the pattern.");
+            }
+            else
+            {
+                searchDataGridView.DataSource = ConvertToDataTable(results);
+            }
+        }
+        
+        // advanced join, unused atm
+        private async void btnAdvancedJoin_Click(object sender, EventArgs e)
+        {
+            var aggregate = await _studentCollection.Aggregate()
+                .Lookup("StudentExtra", "student_id", "student_id", "extraDetails")
+                .ToListAsync();
+
+            searchDataGridView.DataSource = ConvertToDataTable(aggregate);
         }
     }
 }
