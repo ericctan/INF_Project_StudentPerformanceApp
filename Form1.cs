@@ -290,23 +290,29 @@ namespace StudentPerformanceApp
             MessageBox.Show("Search results cleared.");
         }
 
-        // pattern search
+        // pattern search find under 50 avg
         private async void btnPatternSearch_Click(object sender, EventArgs e)
         {
-            
-            var filter = Builders<BsonDocument>.Filter.Lt("student_average", 50);
+            int threshold;
+            if (!int.TryParse(searchTextBox.Text, out threshold))
+            {
+                MessageBox.Show("Please enter a valid threshold in the field above.");
+                return;
+            }
+
+            var filter = Builders<BsonDocument>.Filter.Lt("student_average", threshold);
             var results = await _studentCollection.Find(filter).ToListAsync();
 
             if (results.Count == 0)
             {
-                MessageBox.Show("No students found matching the pattern.");
+                MessageBox.Show("No students found matching the pattern/threshold.");
             }
             else
             {
                 searchDataGridView.DataSource = ConvertToDataTable(results);
             }
         }
-        
+
         // advanced join, unused atm
         private async void btnAdvancedJoin_Click(object sender, EventArgs e)
         {
