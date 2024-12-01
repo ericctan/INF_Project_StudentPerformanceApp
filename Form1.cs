@@ -195,11 +195,24 @@ namespace StudentPerformanceApp
         private async void btnAddStudent_Click(object sender, EventArgs e)
         {
             string studentId = searchTextBox.Text.Trim();
+
             if (string.IsNullOrEmpty(studentId))
             {
                 MessageBox.Show("Please enter a valid student ID.");
                 return;
             }
+
+            // Check for duplicate student_id
+            var filter = Builders<BsonDocument>.Filter.Eq("student_id", studentId);
+            var existingStudent = await _studentCollection.Find(filter).FirstOrDefaultAsync();
+
+            if (existingStudent != null) // If a student with the same ID already exists
+            {
+                MessageBox.Show($"A student with ID {studentId} already exists. Please use a different ID.");
+                return;
+            }
+
+            // Create the new student document
             var newStudent = new BsonDocument
             {
                 { "student_id", studentId },  // Ensure this ID is unique
@@ -214,16 +227,14 @@ namespace StudentPerformanceApp
                 { "student_average", ((int)numMathScore.Value + (int)numReadingScore.Value + (int)numWritingScore.Value) / 3 }
             };
 
-            // error catch for inserting student record
+            // Attempt to insert the new student into the database
             try
             {
-                //insert
                 await _studentCollection.InsertOneAsync(newStudent);
 
-                MessageBox.Show($"Student with ID {studentId} added successfully."); //debug msg
+                MessageBox.Show($"Student with ID {studentId} added successfully."); // Debug message
 
-                // verification
-                var filter = Builders<BsonDocument>.Filter.Eq("student_id", studentId);
+                // Verification: Retrieve and display the newly added student
                 var results = await _studentCollection.Find(filter).ToListAsync();
 
                 if (results.Any())
@@ -235,52 +246,129 @@ namespace StudentPerformanceApp
                     MessageBox.Show("Student was added but not found during verification.");
                 }
             }
-            catch (Exception ex) //error catch
+            catch (Exception ex) // Catch any errors during insertion
             {
                 MessageBox.Show($"Error adding student: {ex.Message}");
             }
         }
 
 
+
         private async void btnUpdate_Click(object sender, EventArgs e)
         {
-            if (!int.TryParse(searchTextBox.Text, out int studentId)) //copium input validation
-            {
-                MessageBox.Show("Please enter a valid student ID.");
-                return; 
-            }
-
-            var filter = Builders<BsonDocument>.Filter.Eq("student_id", searchTextBox.Text);
-
-            var update = Builders<BsonDocument>.Update
-                .Set("gender", txtGender.Text)
-                .Set("race_ethnicity", txtRace.Text)
-                .Set("parental_education", txtParentEdu.Text)
-                .Set("lunch", txtLunch.Text)
-                .Set("test_preparation", txtTestPrep.Text)
-                .Set("math_score", (int)numMathScore.Value)
-                .Set("reading_score", (int)numReadingScore.Value)
-                .Set("writing_score", (int)numWritingScore.Value)
-                .Set("student_average", ((int)numMathScore.Value + (int)numReadingScore.Value + (int)numWritingScore.Value) / 3);
-
-            var result = await _studentCollection.UpdateOneAsync(filter, update);
-
-            MessageBox.Show(result.ModifiedCount > 0 ? "Student updated successfully." : "No student found.");
-        }
-
-        private async void btnDeleteStudent_Click(object sender, EventArgs e)
-        {
-            if (!int.TryParse(searchTextBox.Text, out int studentId)) //more cope
+            // Validate the student ID input
+            if (string.IsNullOrWhiteSpace(searchTextBox.Text))
             {
                 MessageBox.Show("Please enter a valid student ID.");
                 return;
             }
 
-            var filter = Builders<BsonDocument>.Filter.Eq("student_id", searchTextBox.Text);
-            var result = await _studentCollection.DeleteOneAsync(filter);
+            string studentId = searchTextBox.Text.Trim(); // Get the ID as a string
 
-            MessageBox.Show(result.DeletedCount > 0 ? "Student deleted successfully." : "No student found.");
+            // Create a filter for the specified student ID
+            var filter = Builders<BsonDocument>.Filter.Eq("student_id", studentId);
+
+            try
+            {
+                // Fetch the existing record
+                var existingStudent = await _studentCollection.Find(filter).FirstOrDefaultAsync();
+
+                if (existingStudent == null)
+                {
+                    MessageBox.Show("No student found with the specified ID.");
+                    return;
+                }
+
+                // Check if the current input matches the existing record
+                bool isIdentical =
+                    existingStudent["gender"].AsString == txtGender.Text.Trim() &&
+                    existingStudent["race_ethnicity"].AsString == txtRace.Text.Trim() &&
+                    existingStudent["parental_education"].AsString == txtParentEdu.Text.Trim() &&
+                    existingStudent["lunch"].AsString == txtLunch.Text.Trim() &&
+                    existingStudent["test_preparation"].AsString == txtTestPrep.Text.Trim() &&
+                    existingStudent["math_score"].AsInt32 == (int)numMathScore.Value &&
+                    existingStudent["reading_score"].AsInt32 == (int)numReadingScore.Value &&
+                    existingStudent["writing_score"].AsInt32 == (int)numWritingScore.Value;
+
+                if (isIdentical)
+                {
+                    MessageBox.Show("Identical record. Please make changes to the fields before updating.");
+                    return;
+                }
+
+                // Create the update definition
+                var update = Builders<BsonDocument>.Update
+                    .Set("gender", txtGender.Text.Trim())
+                    .Set("race_ethnicity", txtRace.Text.Trim())
+                    .Set("parental_education", txtParentEdu.Text.Trim())
+                    .Set("lunch", txtLunch.Text.Trim())
+                    .Set("test_preparation", txtTestPrep.Text.Trim())
+                    .Set("math_score", (int)numMathScore.Value)
+                    .Set("reading_score", (int)numReadingScore.Value)
+                    .Set("writing_score", (int)numWritingScore.Value)
+                    .Set("student_average", ((int)numMathScore.Value + (int)numReadingScore.Value + (int)numWritingScore.Value) / 3);
+
+                // Execute the update
+                var result = await _studentCollection.UpdateOneAsync(filter, update);
+
+                if (result.ModifiedCount > 0)
+                {
+                    MessageBox.Show("Student updated successfully.");
+
+                    // Fetch and display the updated record
+                    var updatedRecord = await _studentCollection.Find(filter).ToListAsync();
+                    searchDataGridView.DataSource = ConvertToDataTable(updatedRecord);
+                }
+                else
+                {
+                    MessageBox.Show("No changes were made to the record.");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error updating student: {ex.Message}");
+            }
         }
+
+
+
+        private async void btnDeleteStudent_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(searchTextBox.Text)) // Validate input
+            {
+                MessageBox.Show("Please enter a valid student ID.");
+                return;
+            }
+
+            string studentId = searchTextBox.Text.Trim(); // Get student ID
+
+            // Create a filter for the student ID
+            var filter = Builders<BsonDocument>.Filter.Eq("student_id", studentId);
+
+            try
+            {
+                // Attempt to delete the student
+                var result = await _studentCollection.DeleteOneAsync(filter);
+
+                if (result.DeletedCount > 0)
+                {
+                    MessageBox.Show("Student deleted successfully.");
+
+                    // Refresh the DataGridView by showing all remaining students
+                    var allStudents = await _studentCollection.Find(new BsonDocument()).ToListAsync();
+                    searchDataGridView.DataSource = ConvertToDataTable(allStudents);
+                }
+                else
+                {
+                    MessageBox.Show("No student found with the specified ID.");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error deleting student: {ex.Message}");
+            }
+        }
+
 
         //moved clear down here
         private void btnClearResults_Click(object sender, EventArgs e)
@@ -290,7 +378,7 @@ namespace StudentPerformanceApp
             MessageBox.Show("Search results cleared.");
         }
 
-        // pattern search find under 50 avg
+        // pattern search find under threshold
         private async void btnPatternSearch_Click(object sender, EventArgs e)
         {
             int threshold;
